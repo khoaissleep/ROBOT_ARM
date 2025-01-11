@@ -1,6 +1,8 @@
 
 # Robot Arm Project
 
+![Robot Arm](./Robot_arm(image).webp)
+
 ## Giới thiệu
 Dự án này xây dựng và điều khiển một robot arm sử dụng ba động cơ stepper (28BYJ-48) và một servo motor (MG996) trên nền tảng Arduino Mega 2560. Robot arm thực hiện một chuỗi các động tác như xoay cánh tay, cầm đồ lên và thả đồ xuống trong một chu trình lặp đi lặp lại. Dự án này có thể ứng dụng trong các bài toán tự động hóa, robot, và học tập.
 
