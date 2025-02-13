@@ -1,4 +1,3 @@
-
 #include <Servo.h>
 Servo myServo;
 #define IN1_1 2
@@ -16,10 +15,10 @@ Servo myServo;
 #define IN3_3 12
 #define IN4_3 13
 
-// Thời gian delay giữa các bước (điều chỉnh tốc độ động cơ)
+// Delay time between steps (to adjust motor speed)
 int stepDelay = 3;
 
-// Định nghĩa chuỗi bước để quay động cơ
+// Step sequence for rotating the motor
 int stepSequence[8][4] = {
   {1, 0, 0, 0}, // Step 1
   {1, 1, 0, 0}, // Step 2
@@ -31,13 +30,11 @@ int stepSequence[8][4] = {
   {1, 0, 0, 1}  // Step 8
 };
 
-// Số bước mỗi vòng quay giảm từ 512 xuống 256 để tăng góc quay
+// Steps per revolution reduced from 512 to 256 for larger rotation angles
 int stepsPerRevolution = 256;
 
 void setup() {
-
-  
-  myServo.attach(A1);  // Gắn servo vào chân Analog In A1 (dùng như digital)
+  myServo.attach(A1);  // Attach servo to Analog In A1 (used as digital)
   Serial.begin(9600);
 
   pinMode(IN1_1, OUTPUT);
@@ -56,106 +53,82 @@ void setup() {
   pinMode(IN4_3, OUTPUT);
 }
 
-
-void step1_xuoi(){
-    // Quay cùng chiều kim đồng hồ cho motor 1
-  for (int i = 0; i < stepsPerRevolution; i++) { // 256 bước ~ 1 vòng quay rộng hơn
-    stepMotor1(i % 8); // Thực hiện từng bước cho motor 1
+void motor1_forward(){
+  for (int i = 0; i < stepsPerRevolution; i++) {
+    controlMotor1(i % 8); 
     delay(stepDelay);
   }
 }
-void step1_nguoc(){
-  // Quay ngược chiều kim đồng hồ cho motor 1
-  for (int i = stepsPerRevolution - 1; i >= 0; i--) { // Quay ngược 1 vòng
-    stepMotor1(i % 8); // Thực hiện từng bước cho motor 1
-    delay(stepDelay);
-  }
-}
-
-
-
-void step2_xuoi(){
-    // Quay cùng chiều kim đồng hồ cho motor 2
-  for (int i = 0; i < stepsPerRevolution; i++) { // 256 bước ~ 1 vòng quay rộng hơn
-    stepMotor2(i % 8); // Thực hiện từng bước cho motor 2
-    delay(stepDelay);
-  }
-}
-void step2_nguoc(){
-  // Quay ngược chiều kim đồng hồ cho motor 2
-  for (int i = stepsPerRevolution - 1; i >= 0; i--) { // Quay ngược 1 vòng
-    stepMotor2(i % 8); // Thực hiện từng bước cho motor2
+void motor1_backward(){
+  for (int i = stepsPerRevolution - 1; i >= 0; i--) {
+    controlMotor1(i % 8); 
     delay(stepDelay);
   }
 }
 
-
-void step3_xuoi(){
-    // Quay cùng chiều kim đồng hồ cho motor 3
-  for (int i = 0; i < stepsPerRevolution; i++) { // 256 bước ~ 1 vòng quay rộng hơn
-    stepMotor3(i % 8); // Thực hiện từng bước cho motor 3
+void motor2_forward(){
+  for (int i = 0; i < stepsPerRevolution; i++) {
+    controlMotor2(i % 8);
     delay(stepDelay);
   }
 }
-void step3_nguoc(){
-  // Quay ngược chiều kim đồng hồ cho motor 3
-  for (int i = stepsPerRevolution - 1; i >= 0; i--) { // Quay ngược 1 vòng
-    stepMotor3(i % 8); // Thực hiện từng bước cho motor 3
+void motor2_backward(){
+  for (int i = stepsPerRevolution - 1; i >= 0; i--) {
+    controlMotor2(i % 8);
     delay(stepDelay);
   }
 }
 
-void servorun() {
-  myServo.write(90);   // Quay servo đến góc 90 độ
-  delay(1000);         // Giữ tại vị trí 90 độ trong 1 giây
+void motor3_forward(){
+  for (int i = 0; i < stepsPerRevolution; i++) {
+    controlMotor3(i % 8); 
+    delay(stepDelay);
+  }
+}
+void motor3_backward(){
+  for (int i = stepsPerRevolution - 1; i >= 0; i--) {
+    controlMotor3(i % 8);
+    delay(stepDelay);
+  }
+}
 
-  myServo.write(0);    // Quay servo về góc 0 độ
+void controlServo() {
+  myServo.write(90);   // Rotate servo to 90 degrees
+  delay(1000);         
+
+  myServo.write(0);    // Rotate servo back to 0 degrees
   delay(1000);
 }
 void loop() {
-  // làm cho robot cuối xuống để gắp đồ
-  step1_xuoi();
-  step3_xuoi();
-  // xoay cánh tay
-  step2_xuoi();
-  // cầm đồ
-  servorun();
-  // làm cho robot ngẩn đầu lên
-  step1_nguoc();
-  step3_nguoc();
-  // xoay về vị trí cũ
-  step2_nguoc();
-  
-  // làm cho robot cuối xuống để thả đồ
-  step1_xuoi();
-  step3_xuoi();
-  // thả đồ
-  servorun();
-  
-
+  motor1_forward();
+  motor3_forward();
+  motor2_forward();
+  controlServo();
+  motor1_backward();
+  motor3_backward();
+  motor2_backward();
+  motor1_forward();
+  motor3_forward();
+  controlServo();
 }
 
-// Hàm điều khiển motor 1 - cho phần stepper bên trái
-void stepMotor1(int step) {
+void controlMotor1(int step) {
   digitalWrite(IN1_1, stepSequence[step][0]);
   digitalWrite(IN2_1, stepSequence[step][1]);
   digitalWrite(IN3_1, stepSequence[step][2]);
   digitalWrite(IN4_1, stepSequence[step][3]);
 }
 
-// Hàm điều khiển motor 2 cho phần stepper ở dưới robot giúp điều khiển quay trái phải cho robot
-void stepMotor2(int step) {
+void controlMotor2(int step) {
   digitalWrite(IN1_2, stepSequence[step][0]);
   digitalWrite(IN2_2, stepSequence[step][1]);
   digitalWrite(IN3_2, stepSequence[step][2]);
   digitalWrite(IN4_2, stepSequence[step][3]);
 }
 
-// Hàm điều khiển motor 3- cho phần stepper bên phải
-void stepMotor3(int step) {
+void controlMotor3(int step) {
   digitalWrite(IN1_3, stepSequence[step][0]);
   digitalWrite(IN2_3, stepSequence[step][1]);
   digitalWrite(IN3_3, stepSequence[step][2]);
   digitalWrite(IN4_3, stepSequence[step][3]);
 }
-

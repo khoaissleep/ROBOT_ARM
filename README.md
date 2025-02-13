@@ -1,103 +1,88 @@
-
 # Robot Arm Project
 
-![Robot Arm](./Robot_arm(image).webp)
+## Introduction
+This project involves building and controlling a robot arm using three stepper motors (28BYJ-48) and one servo motor (MG996) on the Arduino Mega 2560 platform. The robot arm performs a series of movements such as rotating the arm, picking up objects, and releasing them in a repetitive cycle. This project can be applied to automation tasks, robotics, and educational purposes.
 
-## Giới thiệu
-Dự án này xây dựng và điều khiển một robot arm sử dụng ba động cơ stepper (28BYJ-48) và một servo motor (MG996) trên nền tảng Arduino Mega 2560. Robot arm thực hiện một chuỗi các động tác như xoay cánh tay, cầm đồ lên và thả đồ xuống trong một chu trình lặp đi lặp lại. Dự án này có thể ứng dụng trong các bài toán tự động hóa, robot, và học tập.
+## Main Components
+- **3 Stepper Motors (28BYJ-48)**: Control the rotation and vertical movement of the robot arm.
+- **1 Servo Motor (MG996)**: Controls the gripper mechanism of the robot.
+- **Arduino Mega 2560**: The main controller for motors and input/output devices.
 
-## Các thành phần chính
-- **3 động cơ stepper 28BYJ-48**: Điều khiển cánh tay robot xoay và di chuyển lên xuống.
-- **1 servo MG996**: Điều khiển phần cầm đồ của robot.
-- **Arduino Mega 2560**: Bộ điều khiển chính điều khiển các động cơ và thiết bị đầu vào/đầu ra.
+## Hardware Configuration
+- **Stepper Motors (28BYJ-48)** are connected to the control pins of the Arduino Mega (IN1, IN2, IN3, IN4 for each motor).
+- **Servo Motor (MG996)** is connected to the A1 pin on the Arduino Mega.
 
-## Cấu hình phần cứng
-- **Động cơ stepper 28BYJ-48** được kết nối với các chân điều khiển của Arduino Mega (IN1, IN2, IN3, IN4 cho mỗi motor).
-- **Servo MG996** được kết nối với chân A1 của Arduino Mega.
+## Motion Description
+In the `loop()` section of the code, the robot performs the following actions:
 
-## Mô tả hành động
-Trong phần `loop()` của mã nguồn, robot thực hiện các động tác sau:
+1. **Pick Up Object**:
+   - Stepper motors 1 and 3 move the arm down.
+   - Stepper motor 2 rotates the arm to the correct position.
+   - Servo rotates to 90 degrees to open the gripper.
 
-1. **Cầm đồ**:
-   - Đầu tiên, động cơ stepper 1 và 3 làm cho robot cuối xuống (bằng cách quay động cơ 1 và 3).
-   - Tiếp theo, động cơ stepper 2 quay để cánh tay robot xoay vào vị trí hợp lý.
-   - Servo quay đến vị trí 90 độ để mở phần cầm đồ của robot.
-   
-2. **Đưa đồ lên**:
-   - Sau khi cầm đồ, robot ngẩng đầu lên, bằng cách quay ngược lại động cơ stepper 1 và 3 để đưa cánh tay trở lại vị trí thẳng đứng.
-   - Động cơ stepper 2 quay ngược lại để đưa cánh tay về vị trí ban đầu.
+2. **Lift Object**:
+   - The arm lifts up using stepper motors 1 and 3.
+   - Stepper motor 2 rotates back to the initial position.
 
-3. **Thả đồ**:
-   - Để thả đồ, robot tiếp tục hạ cánh tay xuống bằng động cơ stepper 1 và 3, sau đó mở servo để thả đồ ra.
+3. **Release Object**:
+   - The arm moves down again using stepper motors 1 and 3.
+   - The servo opens the gripper to release the object.
 
-## Chi tiết Code
-Phần dưới đây mô tả cách các động cơ hoạt động trong chương trình:
+## Code Details
+### Stepper Motor Functions
+- **step1_forward**: Rotates stepper motor 1 (left side) clockwise.
+- **step1_backward**: Rotates stepper motor 1 (left side) counterclockwise.
+- **step2_forward**: Rotates stepper motor 2 (bottom) clockwise (rotates the arm left/right).
+- **step2_backward**: Rotates stepper motor 2 (bottom) counterclockwise.
+- **step3_forward**: Rotates stepper motor 3 (right side) clockwise.
+- **step3_backward**: Rotates stepper motor 3 (right side) counterclockwise.
 
-### Các hàm điều khiển động cơ
-- **step1_xuoi**: Quay động cơ 1 (phía trái) cùng chiều kim đồng hồ.
-- **step1_nguoc**: Quay động cơ 1 (phía trái) ngược chiều kim đồng hồ.
-- **step2_xuoi**: Quay động cơ 2 (phía dưới) cùng chiều kim đồng hồ (giúp xoay cánh tay trái/phải).
-- **step2_nguoc**: Quay động cơ 2 (phía dưới) ngược chiều kim đồng hồ.
-- **step3_xuoi**: Quay động cơ 3 (phía phải) cùng chiều kim đồng hồ.
-- **step3_nguoc**: Quay động cơ 3 (phía phải) ngược chiều kim đồng hồ.
+### Servo Motor Function
+- **servorun**: Controls the servo motor to open and close the gripper. The servo rotates to 90 degrees to open and returns to 0 degrees to close the gripper.
 
-### Hàm điều khiển servo
-- **servorun**: Điều khiển servo motor để mở và đóng phần cầm đồ của robot. Servo quay đến góc 90 độ (mở đồ) và sau đó quay về góc 0 độ (đóng đồ).
-
-### Phần Loop
+## Loop Sequence
 ```cpp
 void loop() {
-  // làm cho robot cuối xuống để gắp đồ
-  step1_xuoi();
-  step3_xuoi();
+  // Lower the arm to pick up an object
+  step1_forward();
+  step3_forward();
 
-  // xoay cánh tay
-  step2_xuoi();
+  // Rotate the arm
+  step2_forward();
 
-  // cầm đồ
+  // Pick up the object
   servorun();
 
-  // làm cho robot ngẩn đầu lên
-  step1_nguoc();
-  step3_nguoc();
+  // Lift the arm
+  step1_backward();
+  step3_backward();
 
-  // xoay về vị trí cũ
-  step2_nguoc();
+  // Rotate back to the initial position
+  step2_backward();
 
-  // làm cho robot cuối xuống để thả đồ
-  step1_xuoi();
-  step3_xuoi();
+  // Lower the arm to release the object
+  step1_forward();
+  step3_forward();
 
-  // thả đồ
+  // Release the object
   servorun();
 }
 ```
 
-### Các động tác chi tiết
-1. **Cuối xuống để gắp đồ**: Robot sử dụng động cơ stepper 1 và 3 để làm cho cánh tay đi xuống.
-2. **Xoay cánh tay**: Động cơ stepper 2 giúp quay cánh tay robot để tiếp cận đồ vật.
-3. **Cầm đồ**: Servo quay đến góc 90 độ để mở phần cầm đồ, sau đó robot có thể nhấc đồ lên.
-4. **Ngẩn đầu lên**: Robot sử dụng động cơ stepper 1 và 3 để đưa cánh tay lên.
-5. **Quay về vị trí ban đầu**: Động cơ stepper 2 quay ngược lại để đưa cánh tay trở lại vị trí cũ.
-6. **Cuối xuống để thả đồ**: Robot lại hạ cánh tay xuống và thả đồ bằng cách quay servo về góc 0 độ.
+## Installation and Usage
+### Software Requirements:
+- **Arduino IDE**: To program the Arduino Mega 2560.
+- **Servo Library**: To control the servo motor.
+- **Stepper Library**: To control the stepper motors.
 
-## Cài đặt và sử dụng
+### Setup Instructions:
+1. Open the Arduino IDE and upload the source code to the Arduino Mega 2560.
+2. Connect the motors and servo to the following pins:
+   - Stepper Motor 1 (28BYJ-48): Pins 2, 3, 4, 5.
+   - Stepper Motor 2 (28BYJ-48): Pins 6, 7, 8, 9.
+   - Stepper Motor 3 (28BYJ-48): Pins 10, 11, 12, 13.
+   - Servo: Pin A1.
+3. Install the `Stepper` and `Servo` libraries from the Arduino Library Manager.
 
-### Yêu cầu phần mềm:
-- **Arduino IDE**: Cài đặt phần mềm Arduino IDE để lập trình Arduino Mega 2560.
-- **Thư viện Servo**: Cài đặt thư viện Servo cho điều khiển servo motor.
-- **Thư viện Stepper**: Cài đặt thư viện Stepper cho điều khiển các động cơ stepper.
-
-### Hướng dẫn cài đặt:
-1. Mở Arduino IDE và tải mã nguồn vào Arduino Mega 2560.
-2. Kết nối các động cơ và servo vào các chân như sau:
-   - Động cơ 1 (28BYJ-48): Chân 2, 3, 4, 5.
-   - Động cơ 2 (28BYJ-48): Chân 6, 7, 8, 9.
-   - Động cơ 3 (28BYJ-48): Chân 10, 11, 12, 13.
-   - Servo: Chân A1.
-
-3. Cài đặt thư viện `Stepper` và `Servo` từ Arduino Library Manager.
-
-## Kết luận
-Dự án này mô phỏng một robot arm có thể thực hiện các thao tác đơn giản như gắp đồ và thả đồ. Dự án giúp ứng dụng việc điều khiển động cơ stepper và servo trong các hệ thống robot và tự động hóa.
-
+## Conclusion
+This project demonstrates a robot arm capable of performing basic tasks such as picking up and releasing objects. It applies stepper and servo motor control in robotic systems and automation.
